@@ -142,13 +142,13 @@ class Main extends CI_Controller {
         $i=0;
         foreach($this->data as $val){
 			$objPHPExcel->setActiveSheetIndex(0)
-			            ->setCellValue('A'.$i+4, $i+1)
-			            ->setCellValue('B'.$i+4, $val['title'])
-			            ->setCellValue('C'.$i+4, $val['about'])
-			            ->setCellValue('D'.$i+4, strtoupper($val['tags']))
-			            ->setCellValue('E'.$i+4, $val['company_site'])
-			            ->setCellValue('F'.$i+4, $val['country'])
-			            ->setCellValue('G'.$i+4, $val['features']);
+			            ->setCellValue('A'.($i+4), (string)($i+1))
+			            ->setCellValue('B'.($i+4), $val['title'])
+			            ->setCellValue('C'.($i+4), $val['about'])
+			            ->setCellValue('D'.($i+4), strtoupper($val['tags']))
+			            ->setCellValue('E'.($i+4), $val['company_site'])
+			            ->setCellValue('F'.($i+4), $val['country'])
+			            ->setCellValue('G'.($i+4), $val['features']);
             $i++;
         }
 
