@@ -39,9 +39,8 @@ class Main extends CI_Controller {
 				$this->html_dom->loadHTMLFile($each_page_url);
 
 				$title = $this->html_dom->find('.itemTitle',0)->getInnerText();
+				$title = self::remove_spaces($title);
 
-				// $about = $this->html_dom->find('.itemIntroText',0)->getInnerText();
-				// $about = self::extract_about($about);
 				$about = $this->html_dom->find('.itemIntroText',0);
 				if(!empty($about)){
 					$about = $about->getInnerText();
@@ -51,15 +50,13 @@ class Main extends CI_Controller {
 				}
 
 
-				// $tags = $this->html_dom->find('.itemTags',0)->getInnerText();
-				// $tags = self::extract_tags($tags);
+				$tags = $this->html_dom->find('.itemTags',0);
 				if(!empty($tags)){
 					$tags = $tags->getInnerText();
 					$tags = self::extract_tags($tags);
 				}else{
 					$tags='';
 				}
-
 
 				$company_site = $this->html_dom->find('.itemExtraFieldsValue',3);
 				if(!empty($company_site)){
@@ -69,7 +66,7 @@ class Main extends CI_Controller {
 					$company_site='';
 				}
 
-				// $country = $this->html_dom->find('.itemExtraFieldsValue',2)->getInnerText();
+				$country = $this->html_dom->find('.itemExtraFieldsValue',2);//->getInnerText();
 				// $country = self::extract_country($country);
 				if(!empty($country)){
 					$country = $country->getInnerText();
@@ -78,7 +75,7 @@ class Main extends CI_Controller {
 					$country='';
 				}
 
-				// $features = $this->html_dom->find('.list',0)->getInnerText();
+				$features = $this->html_dom->find('.list',0);//->getInnerText();
 				// $features = self::extract_features($features);
 				if(!empty($features)){
 					$features = $features->getInnerText();
@@ -86,6 +83,7 @@ class Main extends CI_Controller {
 				}else{
 					$features='';
 				}
+// self::display_data($features);die;
 
 
 				$this->data[$i] = array();
@@ -142,13 +140,13 @@ class Main extends CI_Controller {
         $i=0;
         foreach($this->data as $val){
 			$objPHPExcel->setActiveSheetIndex(0)
-			            ->setCellValue('A'.($i+4), (string)($i+1))
-			            ->setCellValue('B'.($i+4), $val['title'])
-			            ->setCellValue('C'.($i+4), $val['about'])
-			            ->setCellValue('D'.($i+4), strtoupper($val['tags']))
-			            ->setCellValue('E'.($i+4), $val['company_site'])
-			            ->setCellValue('F'.($i+4), $val['country'])
-			            ->setCellValue('G'.($i+4), $val['features']);
+			            ->setCellValue('A'.($i+4), (string)($i+1))      // serial number
+			            ->setCellValue('B'.($i+4), $val['title'])       // company/product name
+			            ->setCellValue('C'.($i+4), $val['about'])       // about
+			            ->setCellValue('D'.($i+4), strtoupper($val['tags']))//tags
+			            ->setCellValue('E'.($i+4), $val['company_site'])// website
+			            ->setCellValue('F'.($i+4), $val['country'])     // country
+			            ->setCellValue('G'.($i+4), $val['features']);   // innovative features
             $i++;
         }
 
@@ -173,11 +171,11 @@ class Main extends CI_Controller {
 		 
 		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 		$objWriter->save('php://output');
-
-
 	}
 
-
+	public function remove_spaces($str){
+		return preg_replace("/\s+/", " ", $str);
+	}
 
 	public function next_page(){
 		$this->html_dom->loadHTMLFile($this->url);
@@ -204,7 +202,7 @@ class Main extends CI_Controller {
 
 		$tags = $dom->getElementsByTagName('li');
 		foreach ($tags as $tag) {
-		     $features .=  '\n '.$tag->nodeValue;
+		     $features .=  $tag->nodeValue.PHP_EOL;
 		}
 
 		return $features;
@@ -219,7 +217,13 @@ class Main extends CI_Controller {
 
 		$tags_inner = $dom->getElementsByTagName('p');
 		foreach ($tags_inner as $tag_inner) {
-		     $about =  $tag_inner->nodeValue;
+			$about = $tag_inner->nodeValue;
+		    // $about = str_replace('&#13;', '', $about);
+		    $about = self::remove_spaces($about);
+		     // $about = preg_replace("/&#13;/", " ", $about);
+// self::display_data($about);
+		    
+// self::display_data($about);die;
 		     // break;
 		}
 
@@ -234,7 +238,7 @@ class Main extends CI_Controller {
 
 		$tags_inner = $dom->getElementsByTagName('a');
 		foreach ($tags_inner as $tag_inner) {
-		     $tags .=  '\n '.$tag_inner->nodeValue;
+		     $tags .=  $tag_inner->nodeValue.PHP_EOL;
 		}
 
 		return $tags;
